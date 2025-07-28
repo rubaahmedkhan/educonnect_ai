@@ -102,7 +102,8 @@ For collaboration or questions:
 
 *Ruba Ahmed Khan*  
 Email: rubaahmedkhan786@gmail.com 
-LinkedIn: [linkedin.com/in/rubaahmed](https://linkedin.com/in/rubaukhan)
+
+LinkedIn: [linkedin](https://linkedin.com/in/rubaukhan)
 
 ---
 
