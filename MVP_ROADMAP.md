@@ -105,6 +105,12 @@ Email: rubaahmedkhan786@gmail.com
 
 LinkedIn: [linkedin](https://linkedin.com/in/rubaukhan)
 
+*Sadaf fawad*
+
+Email: pearlfawad@gmail.com
+
+LinkedIn: [linkedin](https://www.linkedin.com/in/sadaf-fawad-113219354)
+
 ---
 
 > 🧠 Built with purpose. Powered by AI.
