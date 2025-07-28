@@ -101,8 +101,8 @@ This MVP allows teachers to upload a student Excel sheet, automatically generate
 For collaboration or questions:
 
 *Ruba Ahmed Khan*  
-Email: rubaahmedkhan786@gmail.com  
-LinkedIn: [linkedin.com/in/rubaahmed](www.linkedin.com/in/rubaukhan)
+Email: rubaahmedkhan786@gmail.com 
+LinkedIn: [linkedin.com/in/rubaahmed](https://linkedin.com/in/rubaukhan)
 
 ---
 
