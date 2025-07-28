@@ -6,7 +6,7 @@ This is the official pitch deck for EduConnect AI, outlining the problem, soluti
 
 ## 🎥 View the Full Pitch Deck:
 
-🔗 *Click here to view the slides on Canva:*  
+🔗 *Click here to view the slides:*  
 [👉 EduConnect AI – Pitch Deck ](https://eduv.my.canva.site/)
 
 
