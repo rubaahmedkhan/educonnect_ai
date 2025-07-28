@@ -20,7 +20,7 @@ This MVP allows teachers to upload a student result sheet, automatically generat
 
 | Name               | Role                                                      |
 |--------------------|-----------------------------------------------------------|
-| Ruba Ahmed Khan    | Co-Founder, Product Lead,Agent SDK Specialist & AI Engineer            |
+| Ruba Ahmed Khan    | Co-Founder, Product Lead, Agent SDK Specialist & AI Engineer            |
 | Sadaf              | Co-Founder, Agent SDK Specialist, Prompt Engineer & AI Engineer        |
 
 ---
@@ -48,7 +48,7 @@ The following parts are intentionally kept private to protect original intellect
 - Sensitive API keys or .env files
 
 To request full access for demo or testing purposes, contact:  
-📧 ruba@example.com
+📧 rubaahmedkhan786@gmail.com
 
 ---
 
