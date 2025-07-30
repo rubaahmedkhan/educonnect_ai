@@ -3,18 +3,13 @@ from agents.run import RunConfig
 import pandas as pd
 import asyncio
 
-gemini_api_key = "gemini_api_key"
+gemini_api_key = ""
 
-# Check if the API key is present; if not, raise an error
-if not gemini_api_key:
-    raise ValueError("GEMINI_API_KEY is not set. Please ensure it is defined in your .env file.")
-
-# Reference: https://ai.google.dev/gemini-api/docs/openai
+# Initialize model
 external_client = AsyncOpenAI(
     api_key=gemini_api_key,
     base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
 )
-model_settings = ModelSettings()
 
 model = OpenAIChatCompletionsModel(
     model="gemini-2.0-flash",
@@ -24,57 +19,83 @@ model = OpenAIChatCompletionsModel(
 config = RunConfig(
     model=model,
     model_provider=external_client,
-    model_settings=model_settings,
+    model_settings=ModelSettings(),
     tracing_disabled=True,
 )
 
-# Threshold average marks per subject
-THRESHOLD = 50  # aap isay customize kar sakte hain
-
-# 
 @function_tool
 def generate_student_report(excel_path: str) -> str:
-    df = pd.read_csv("file_reader/excel_sheet.csv")
+    df = pd.read_csv(excel_path)
+    df.columns = df.columns.str.strip()  # Clean headers
 
-    # Strip column names to avoid hidden spaces
-    df.columns = df.columns.str.strip()
-
-    # Feedback threshold
-    THRESHOLD = 50
-
-    # Group by student
     reports = []
     grouped = df.groupby(["Student_id", "Student Name", "Class"])
 
     for (student_id, name, class_), group in grouped:
-        report = f"📘 Student: {name} (Class {class_})\n"
+        report_lines = []
+        total_obtained = 0
+        total_marks = 0
         weak_subjects = []
 
+        report_lines.append(f"===============================")
+        report_lines.append(f"📘 Student Report")
+        report_lines.append(f"👤 Name: {name}")
+        report_lines.append(f"🆔 ID: {student_id}")
+        report_lines.append(f"🏫 Class: {class_}")
+        report_lines.append(f"-------------------------------")
+        report_lines.append(f"📊 Subject-wise Performance:")
+
         for _, row in group.iterrows():
-            subject = row["Subject"].strip().lower()
-            obtained = row["Obtained  Marks"]  # watch out for double space
+            subject = row["Subject"].strip()
+            obtained = row["Obtained  Marks"]
             total = row["Total  Marks"]
+            percentage = (obtained / total) * 100
 
-            if (obtained / total) * 100 < THRESHOLD:
-                weak_subjects.append(f"{subject.title()} ({obtained}/{total})")
+            report_lines.append(f" - {subject}: {obtained}/{total} ({percentage:.1f}%)")
 
+            total_obtained += obtained
+            total_marks += total
+
+            if percentage < 50:
+                weak_subjects.append((subject, percentage))
+
+        overall_percent = (total_obtained / total_marks) * 100
+        report_lines.append(f"-------------------------------")
+        report_lines.append(f"📈 Total: {total_obtained}/{total_marks} ({overall_percent:.1f}%)")
+        report_lines.append(f"===============================")
+        report_lines.append(f"📝 Review:")
+
+        # Generate review
         if weak_subjects:
-            report += "⚠ Needs improvement in: " + ", ".join(weak_subjects)
+            subjects_str = ", ".join([f"{s} ({p:.1f}%)" for s, p in weak_subjects])
+            report_lines.append(f"⚠ {name} needs to improve in: {subjects_str}.")
+            report_lines.append(f"📌 Recommendation: Study at least 1-2 hours more daily focusing on weak areas. Try practicing past papers and stay consistent.")
         else:
-            report += "✅ Performing well in all subjects."
+            report_lines.append(f"✅ Excellent performance. No weak subjects identified.")
+            report_lines.append(f"🎯 Keep up the consistency. Continue regular study habits to maintain this performance.")
 
-        reports.append(report)
+        reports.append("\n".join(report_lines))
 
     return "\n\n".join(reports)
 
+# Define the agent with improved instructions
+agent = Agent(
+    name="admin",
+    instructions="""
+    You are a report generating assistant. You help teachers by creating student performance reports from Excel files.
+    You MUST include: Student Name, ID, Class, Subject-wise marks, Total percentage, and a review.
+    The review should be clear, helpful, and tailored to student needs.
+    """,
+    tools=[generate_student_report]
+)
 
-   
-agent=Agent(name="admin",
-            instructions="you are creating student report with the help of tool generate_student_report",
-            tools=[generate_student_report])
-
+# Runner
 async def main():
-    result=await Runner.run(agent,input="generate a report of students giving in excel file file_reader/excel_sheet.csv ",run_config=config)
-    print (result.final_output)
+    result = await Runner.run(
+        agent,
+        input="Generate a detailed student report using the Excel file at file_reader/excel_sheet.csv",
+        run_config=config
+    )
+    print(result.final_output)
 
 asyncio.run(main())
