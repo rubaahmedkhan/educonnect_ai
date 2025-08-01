@@ -20,33 +20,21 @@ model = OpenAIChatCompletionsModel(
 config = RunConfig(
     model=model,
     model_provider=external_client,
-    model_settings=ModelSettings(tool_choice="required"),
+    model_settings=model_settings,
     tracing_disabled=True,
 )
 
 @function_tool
-def generate_student_report(input_str: str) -> str:
-    # Extract file path from input
-    try:
-        if "excel file" in input_str:
-            file_path = input_str.split("excel file")[-1].strip()
-        elif input_str.endswith(".csv") and os.path.exists(input_str):
-            file_path = input_str
-        else:
-            return f"❌ Error: Could not detect file path in input: {input_str}"
-    except Exception as e:
-        return f"❌ Error parsing file path: {str(e)}"
+def generate_student_report(excel_path: str) -> str:
+    df = pd.read_csv("file_reader/excel_sheet.csv")
 
-    if not os.path.exists(file_path):
-        return f"❌ Error: File not found at path: {file_path}"
+    # Strip column names to avoid hidden spaces
+    df.columns = df.columns.str.strip()
 
-    try:
-        df = pd.read_csv(file_path)
-    except Exception as e:
-        return f"❌ Error reading file: {str(e)}"
+    # Feedback threshold
+    THRESHOLD = 50
 
-    df.columns = df.columns.str.strip()  # Clean headers
-
+    # Group by student
     reports = []
     grouped = df.groupby(["Student_id", "Student Name", "Class"])
 
@@ -108,13 +96,8 @@ agent = Agent(
     tools=[generate_student_report]
 )
 
-# Runner
-# async def main():
-#     result = await Runner.run(
-#         agent,
-#         input="Generate a detailed student report using the Excel file at file_reader/excel_sheet.csv",
-#         run_config=config
-#     )
-#     print(result.final_output)
+async def main():
+    result=await Runner.run(agent,input="generate a report of students giving in excel file file_reader/excel_sheet.csv ",run_config=config)
+    print (result.final_output)
 
 # asyncio.run(main())
